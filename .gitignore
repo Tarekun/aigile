@@ -1,2 +1,5 @@
 backend/.venv
 /**/__pycache__
+.aider*
+# directory for local docker deployments
+dockerdev*
