@@ -17,6 +17,13 @@ The `Issue` class represents an issue or task within a version control system:
 - `state`: str - Current state of the issue (e.g., "open", "closed")
 - `url`: str - URL to view the issue online
 
+### `IssueFilter` Data Structure
+
+The `IssueFilter` class represents filters that can be applied when retrieving issues:
+
+- `status`: Optional[str] - Filter by issue status (e.g., "open", "closed")
+- `label`: Optional[str] - Filter by label name
+
 ### `VCClient` Interface
 
 The `VCClient` abstract base class defines the interface that all version control system clients must implement:
@@ -35,17 +42,21 @@ Parameters:
 
 #### Methods
 
-##### `get_open_issues()`
+##### `get_open_issues(filters: Optional[IssueFilter] = None)`
 
 ```python
-def get_open_issues(self) -> List[Issue]:
+def get_open_issues(self, filters: Optional[IssueFilter] = None) -> List[Issue]:
 ```
 
-Retrieves all open issues from the specified repository.
+Retrieves issues from the specified repository with optional filtering.
+
+Parameters:
+
+- `filters`: Optional[IssueFilter] - Filters to apply when retrieving issues
 
 Returns:
 
-- `List[Issue]` - A list of Issue objects representing open issues
+- `List[Issue]` - A list of Issue objects representing filtered issues
 
 Raises:
 

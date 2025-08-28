@@ -1,7 +1,6 @@
 from typing import List
-from version_control.interface import VCClient, Issue
-from github import Github, GithubException, PaginatedList
-from github.Issue import Issue as GithubIssue
+from version_control.interface import VCClient, Issue, IssueFilter, empty_filters
+from github import Github, GithubException, GithubObject
 
 
 def map_github_issues(github_issues) -> List[Issue]:
@@ -12,8 +11,7 @@ def map_github_issues(github_issues) -> List[Issue]:
             description=issue.body or "",
             state=issue.state,
             url=issue.html_url,
-            # labels=[label.name for label in issue.labels],
-            # assignees=[assignee.login for assignee in issue.assignees],
+            labels=[label.name for label in issue.labels],
         )
         for issue in github_issues
     ]
@@ -31,11 +29,15 @@ class GitHubClient(VCClient):
         self.repo_full_name = repo_full_name
         self.github_client = Github(base_url=base_url, login_or_token=token)
 
-    def get_open_issues(self) -> List[Issue]:
+    def fetch_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
         try:
-            github_repo = self.github_client.get_repo(self.repo_full_name)
-            issues = github_repo.get_issues(state="open")
+            state = filters.state if filters.state is not None else GithubObject.NotSet
+            labels = (
+                filters.labels if filters.labels is not None else GithubObject.NotSet
+            )
 
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            issues = github_repo.get_issues(state=state, labels=labels)
             return map_github_issues(issues)
 
         except GithubException as e:
