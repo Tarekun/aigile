@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -12,8 +12,18 @@ class Issue:
     description: str
     state: str
     url: str
+    labels: List[str] = field(default_factory=list)
     # labels: Optional[List[str]] = None
     # assignees: Optional[List[str]] = None
+
+
+@dataclass
+class IssueFilter:
+    state: Optional[str]
+    labels: Optional[List[str]]
+
+
+empty_filters = IssueFilter(state=None, labels=None)
 
 
 class VCClient(ABC):
@@ -25,7 +35,7 @@ class VCClient(ABC):
         pass
 
     @abstractmethod
-    def get_open_issues(self) -> List[Issue]:
+    def fetch_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
         """Get all open issues for a repository"""
         pass
 
@@ -33,6 +43,9 @@ class VCClient(ABC):
     def add_comment_to_issue(self) -> bool:
         """Add a comment to an existing issue"""
         pass
+
+    def fetch_feature_requests(self) -> List[Issue]:
+        return self.fetch_issues(IssueFilter(state="open", labels=["feature-request"]))
 
     # @abstractmethod
     # def test_connection(self) -> bool:
