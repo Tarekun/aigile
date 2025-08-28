@@ -11,7 +11,7 @@ class Issue:
     title: str
     description: str
     state: str
-    url: Optional[str] = None
+    url: str
     # labels: Optional[List[str]] = None
     # assignees: Optional[List[str]] = None
 
@@ -20,7 +20,7 @@ class VCClient(ABC):
     """Abstract base class for version control system clients"""
 
     @abstractmethod
-    def __init__(self, base_url: str, token: Optional[str] = None, **kwargs):
+    def __init__(self, token: str, repo_full_name: str, base_url: str):
         """Initialize the client with connection details"""
         pass
 
