@@ -29,7 +29,7 @@ class GitHubClient(VCClient):
         self.repo_full_name = repo_full_name
         self.github_client = Github(base_url=base_url, login_or_token=token)
 
-    def fetch_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
+    def get_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
         try:
             state = filters.state if filters.state is not None else GithubObject.NotSet
             labels = (
@@ -66,7 +66,7 @@ class GitHubClient(VCClient):
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
 
-    def add_comment_to_issue(self, issue: Issue, comment: str):
+    def post_comment_to_issue(self, issue: Issue, comment: str):
         try:
             if issue.id is None:
                 raise ValueError(
@@ -84,6 +84,3 @@ class GitHubClient(VCClient):
                 raise ConnectionError(f"GitHub API error: {e}")
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
-
-    # def test_connection(self) -> bool:
-    #     return False
