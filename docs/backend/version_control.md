@@ -42,17 +42,17 @@ Parameters:
 
 #### Methods
 
-##### `get_open_issues(filters: Optional[IssueFilter] = None)`
+##### `fetch_issues(filters: IssueFilter = empty_filters) -> List[Issue]`
 
 ```python
-def get_open_issues(self, filters: Optional[IssueFilter] = None) -> List[Issue]:
+def fetch_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
 ```
 
 Retrieves issues from the specified repository with optional filtering.
 
 Parameters:
 
-- `filters`: Optional[IssueFilter] - Filters to apply when retrieving issues
+- `filters`: IssueFilter - Filters to apply when retrieving issues
 
 Returns:
 
@@ -62,6 +62,47 @@ Raises:
 
 - `ValueError` - If the repository is not found
 - `PermissionError` - If insufficient permissions to access the repository
+- `ConnectionError` - For API connection or other unexpected errors
+
+##### `add_comment_to_issue(issue: Issue, comment: str) -> bool`
+
+```python
+def add_comment_to_issue(self, issue: Issue, comment: str) -> bool:
+```
+
+Adds a comment to an existing issue.
+
+Parameters:
+
+- `issue`: Issue - The issue to comment on
+- `comment`: str - The comment text to add
+
+Returns:
+
+- `bool` - True if the comment was successfully added
+
+Raises:
+
+- `ValueError` - If the issue is not found
+- `PermissionError` - If insufficient permissions to comment on the issue
+- `ConnectionError` - For API connection or other unexpected errors
+
+##### `post_new_issue(issue: Issue)`
+
+```python
+def post_new_issue(self, issue: Issue):
+```
+
+Creates a new issue in the specified repository.
+
+Parameters:
+
+- `issue`: Issue - The issue to create
+
+Raises:
+
+- `ValueError` - If the repository is not found
+- `PermissionError` - If insufficient permissions to create an issue
 - `ConnectionError` - For API connection or other unexpected errors
 
 ### Implementations

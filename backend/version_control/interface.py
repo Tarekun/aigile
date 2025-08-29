@@ -7,11 +7,11 @@ from dataclasses import dataclass, field
 class Issue:
     """Data structure representing an issue on version control system"""
 
-    id: int
     title: str
     description: str
     state: str
-    url: str
+    url: Optional[str] = None
+    id: Optional[int] = None
     labels: List[str] = field(default_factory=list)
     # labels: Optional[List[str]] = None
     # assignees: Optional[List[str]] = None
@@ -40,8 +40,13 @@ class VCClient(ABC):
         pass
 
     @abstractmethod
-    def add_comment_to_issue(self) -> bool:
+    def add_comment_to_issue(self, issue: Issue, comment: str):
         """Add a comment to an existing issue"""
+        pass
+
+    @abstractmethod
+    def post_new_issue(self, issue: Issue):
+        """Creates the provided issue on the version control system"""
         pass
 
     def fetch_feature_requests(self) -> List[Issue]:

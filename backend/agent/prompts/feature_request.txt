@@ -12,16 +12,28 @@ Regardless of what the response is you should always adhere to the following JSO
         {{
             title: "Some title",
             description: "Extreamly detailed description of the task at hand",
-            epic: "The epic containing this issue"
+            epic: "The epic containing this issue",
+            labels: ["label1", ... , "labeln"]
         }}
     ],
     solved: true | false,
+    leave_comment: true | false,
     extra_details: "Free text where you can embed a discussion of the issues created or the missing information needed to break down the feature into issues"
 }}
 ```
 
-Currently available epics are the following (you are allowed to name new ones, but if similar are already available use these): {epics}
+Note that `solved` is a crucial field important to get right and should be valued `false` if and only if you didnt generate any issue.
+In case you were able to generate some issues you must set `solved` to `true`.
+In case this is a border line description, where you can make some non exhaustive issues, set the `leave_comment` field to true and use the `extra_details` field to tell the user what they should add to the description for better analysis.
 
-Title of the feature request is {title}
+Currently available epics are the following (you are allowed to name new ones, but if similar are already available use these):
+{epics}
 
-The description of the feature request is {description}
+Currently available labels are the following (do not go and create new unnecessary labels, you're always allowed to leave an issue with no labels):
+{labels}
+
+Title of the feature request is:
+{title}
+
+The description of the feature request is:
+{description}

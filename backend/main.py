@@ -1,5 +1,8 @@
+from version_control.interface import Issue
 from version_control.github_client import GitHubClient
-from llm_api.tmp import callable_client
+from agent.utils import callable_client
+from agent.actions import process_feature_request_all
+
 
 llm = callable_client(
     provider="ollama",
@@ -11,10 +14,4 @@ client = GitHubClient(
     repo_full_name="Tarekun/aigile",
     # base_url="",
 )
-with open("./llm_api/prompts/feature_request.txt", "r", encoding="utf-8") as f:
-    feature_request_prompt = f.read()
-
-print(client.fetch_feature_requests())
-for r in client.fetch_feature_requests():
-    args = {"title": r.title, "description": r.description, "epics": []}
-    print(llm(feature_request_prompt, args))
+process_feature_request_all(client, llm)

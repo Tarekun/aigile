@@ -50,8 +50,40 @@ class GitHubClient(VCClient):
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
 
-    def add_comment_to_issue(self) -> bool:
-        return False
+    def post_new_issue(self, issue: Issue):
+        try:
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            github_repo.create_issue(
+                title=issue.title, body=issue.description, labels=issue.labels
+            )
+        except GithubException as e:
+            if e.status == 404:
+                raise ValueError(f"Repository {self.repo_full_name} not found")
+            elif e.status == 403:
+                raise PermissionError("Insufficient permissions to create issue")
+            else:
+                raise ConnectionError(f"GitHub API error: {e}")
+        except Exception as e:
+            raise ConnectionError(f"Unexpected error: {e}")
+
+    def add_comment_to_issue(self, issue: Issue, comment: str):
+        try:
+            if issue.id is None:
+                raise ValueError(
+                    f"Cannot comment issue with no id. Input issue was {issue}"
+                )
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            github_issue = github_repo.get_issue(number=issue.id)
+            github_issue.create_comment(comment)
+        except GithubException as e:
+            if e.status == 404:
+                raise ValueError(f"Issue {issue.id} not found")
+            elif e.status == 403:
+                raise PermissionError("Insufficient permissions to comment on issue")
+            else:
+                raise ConnectionError(f"GitHub API error: {e}")
+        except Exception as e:
+            raise ConnectionError(f"Unexpected error: {e}")
 
     # def test_connection(self) -> bool:
     #     return False
