@@ -17,6 +17,13 @@ The `Issue` class represents an issue or task within a version control system:
 - `state`: str - Current state of the issue (e.g., "open", "closed")
 - `url`: str - URL to view the issue online
 
+### `IssueFilter` Data Structure
+
+The `IssueFilter` class represents filters that can be applied when retrieving issues:
+
+- `status`: Optional[str] - Filter by issue status (e.g., "open", "closed")
+- `label`: Optional[str] - Filter by label name
+
 ### `VCClient` Interface
 
 The `VCClient` abstract base class defines the interface that all version control system clients must implement:
@@ -35,22 +42,67 @@ Parameters:
 
 #### Methods
 
-##### `get_open_issues()`
+##### `fetch_issues(filters: IssueFilter = empty_filters) -> List[Issue]`
 
 ```python
-def get_open_issues(self) -> List[Issue]:
+def fetch_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
 ```
 
-Retrieves all open issues from the specified repository.
+Retrieves issues from the specified repository with optional filtering.
+
+Parameters:
+
+- `filters`: IssueFilter - Filters to apply when retrieving issues
 
 Returns:
 
-- `List[Issue]` - A list of Issue objects representing open issues
+- `List[Issue]` - A list of Issue objects representing filtered issues
 
 Raises:
 
 - `ValueError` - If the repository is not found
 - `PermissionError` - If insufficient permissions to access the repository
+- `ConnectionError` - For API connection or other unexpected errors
+
+##### `add_comment_to_issue(issue: Issue, comment: str) -> bool`
+
+```python
+def add_comment_to_issue(self, issue: Issue, comment: str) -> bool:
+```
+
+Adds a comment to an existing issue.
+
+Parameters:
+
+- `issue`: Issue - The issue to comment on
+- `comment`: str - The comment text to add
+
+Returns:
+
+- `bool` - True if the comment was successfully added
+
+Raises:
+
+- `ValueError` - If the issue is not found
+- `PermissionError` - If insufficient permissions to comment on the issue
+- `ConnectionError` - For API connection or other unexpected errors
+
+##### `post_new_issue(issue: Issue)`
+
+```python
+def post_new_issue(self, issue: Issue):
+```
+
+Creates a new issue in the specified repository.
+
+Parameters:
+
+- `issue`: Issue - The issue to create
+
+Raises:
+
+- `ValueError` - If the repository is not found
+- `PermissionError` - If insufficient permissions to create an issue
 - `ConnectionError` - For API connection or other unexpected errors
 
 ### Implementations

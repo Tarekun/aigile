@@ -1,7 +1,6 @@
 from typing import List
-from version_control.interface import VCClient, Issue
-from github import Github, GithubException, PaginatedList
-from github.Issue import Issue as GithubIssue
+from version_control.interface import VCClient, Issue, IssueFilter, empty_filters
+from github import Github, GithubException, GithubObject
 
 
 def map_github_issues(github_issues) -> List[Issue]:
@@ -12,8 +11,7 @@ def map_github_issues(github_issues) -> List[Issue]:
             description=issue.body or "",
             state=issue.state,
             url=issue.html_url,
-            # labels=[label.name for label in issue.labels],
-            # assignees=[assignee.login for assignee in issue.assignees],
+            labels=[label.name for label in issue.labels],
         )
         for issue in github_issues
     ]
@@ -31,11 +29,15 @@ class GitHubClient(VCClient):
         self.repo_full_name = repo_full_name
         self.github_client = Github(base_url=base_url, login_or_token=token)
 
-    def get_open_issues(self) -> List[Issue]:
+    def get_issues(self, filters: IssueFilter = empty_filters) -> List[Issue]:
         try:
-            github_repo = self.github_client.get_repo(self.repo_full_name)
-            issues = github_repo.get_issues(state="open")
+            state = filters.state if filters.state is not None else GithubObject.NotSet
+            labels = (
+                filters.labels if filters.labels is not None else GithubObject.NotSet
+            )
 
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            issues = github_repo.get_issues(state=state, labels=labels)
             return map_github_issues(issues)
 
         except GithubException as e:
@@ -48,8 +50,37 @@ class GitHubClient(VCClient):
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
 
-    def add_comment_to_issue(self) -> bool:
-        return False
+    def post_new_issue(self, issue: Issue):
+        try:
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            github_repo.create_issue(
+                title=issue.title, body=issue.description, labels=issue.labels
+            )
+        except GithubException as e:
+            if e.status == 404:
+                raise ValueError(f"Repository {self.repo_full_name} not found")
+            elif e.status == 403:
+                raise PermissionError("Insufficient permissions to create issue")
+            else:
+                raise ConnectionError(f"GitHub API error: {e}")
+        except Exception as e:
+            raise ConnectionError(f"Unexpected error: {e}")
 
-    # def test_connection(self) -> bool:
-    #     return False
+    def post_comment_to_issue(self, issue: Issue, comment: str):
+        try:
+            if issue.id is None:
+                raise ValueError(
+                    f"Cannot comment issue with no id. Input issue was {issue}"
+                )
+            github_repo = self.github_client.get_repo(self.repo_full_name)
+            github_issue = github_repo.get_issue(number=issue.id)
+            github_issue.create_comment(comment)
+        except GithubException as e:
+            if e.status == 404:
+                raise ValueError(f"Issue {issue.id} not found")
+            elif e.status == 403:
+                raise PermissionError("Insufficient permissions to comment on issue")
+            else:
+                raise ConnectionError(f"GitHub API error: {e}")
+        except Exception as e:
+            raise ConnectionError(f"Unexpected error: {e}")
