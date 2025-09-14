@@ -49,3 +49,9 @@ mr = MergeRequest(id=180, title="", description="", state="open")
 # client.create_issue(issue)
 print(client.get_mr_diff(mr))
 # process_feature_request_all(client, llm)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("webhook.tmp:app", host="0.0.0.0", port=10080, reload=True)
