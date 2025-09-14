@@ -14,7 +14,6 @@ class Issue:
     url: Optional[str] = None
     id: Optional[int] = None
     labels: List[str] = field(default_factory=list)
-    # labels: Optional[List[str]] = None
     # assignees: Optional[List[str]] = None
 
 
