@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, cast
 from dataclasses import dataclass, field
 from logger import logger
+import os
+from git import Repo
 
 
 @dataclass
@@ -50,6 +52,23 @@ class VCClient(ABC):
     def post_new_issue(self, issue: Issue):
         """POST API call to create a new issue. No error handling expected"""
         pass
+
+    @abstractmethod
+    def get_repo_url(self) -> str:
+        pass
+
+    def clone_or_pull(self, local_path: str, branch: str = "main"):
+        try:
+            if not os.path.exists(local_path):
+                Repo.clone_from(self.get_repo_url(), local_path, branch=branch)
+                logger.debug(f"Cloned repository to {local_path}")
+            else:
+                repo = Repo(local_path)
+                origin = repo.remotes.origin
+                origin.pull(branch)
+                logger.debug(f"Pulled branch to {local_path}")
+        except Exception as e:
+            logger.debug(f"{e}")
 
     def _retry_api_call(self, callable):
         tries = 0

@@ -1,6 +1,7 @@
 from typing import List
 from version_control.interface import VCClient, Issue, IssueFilter, empty_filters
 from github import Github, GithubException, GithubObject
+from typing import List, Optional, cast
 
 
 def map_github_issues(github_issues) -> List[Issue]:
@@ -84,3 +85,6 @@ class GitHubClient(VCClient):
                 raise ConnectionError(f"GitHub API error: {e}")
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
+
+    def get_repo_url(self) -> str:
+        return f"https://{self.token}@github.com/{self.repo_full_name}.git"
