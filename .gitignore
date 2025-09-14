@@ -4,3 +4,4 @@
 # directory for local docker deployments
 dockerdev*
 backend/logs
+backend/.env*
