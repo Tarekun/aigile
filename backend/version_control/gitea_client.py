@@ -1,4 +1,5 @@
 from typing import List
+from version_control.interface import MergeRequest
 from version_control.interface import VCClient, Issue, IssueFilter, empty_filters
 import requests
 from requests.exceptions import RequestException
@@ -127,3 +128,33 @@ class GiteaClient(VCClient):
             raise ConnectionError(f"Network error connecting to Gitea: {e}")
         except Exception as e:
             raise ConnectionError(f"Unexpected error: {e}")
+
+    def get_mr_diff(self, mr: MergeRequest) -> str:
+        try:
+            url = f"{self.base_url}/repos/{self.repo_full_name}/pulls/{mr.id}.diff"
+
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            # print(response.json())
+
+            return response.text
+
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                raise ValueError(
+                    f"Merge request {mr.id} not found in repo {self.repo_full_name}"
+                )
+            elif e.response.status_code == 403:
+                raise PermissionError("Insufficient permissions to access MR diff")
+            else:
+                raise ConnectionError(f"Gitea API error: {e}")
+        except RequestException as e:
+            raise ConnectionError(f"Network error connecting to Gitea: {e}")
+        except Exception as e:
+            raise ConnectionError(f"Unexpected error: {e}")
+
+    def get_mr_issue(self, mr: MergeRequest) -> Issue | None:
+        # TODO Gitea doesnt have direct linking between PR and issues
+        # you can get it from # references in title/description
+        # or you can query for issues linked to the same branch
+        return None

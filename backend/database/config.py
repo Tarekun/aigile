@@ -1,9 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 db_engine = os.getenv("DB_ENGINE")
 db_host = os.getenv("DB_HOST")
 db_user = os.getenv("DB_USER")

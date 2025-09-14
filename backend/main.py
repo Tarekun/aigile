@@ -1,9 +1,13 @@
-from version_control.interface import Issue
+from version_control.interface import Issue, MergeRequest
 from version_control.github_client import GitHubClient
 from version_control.gitea_client import GiteaClient
 from agent.utils import callable_client
 from agent.actions import process_feature_request_all
+from dotenv import load_dotenv
+import os
 
+
+load_dotenv()
 
 # llm = callable_client(
 #     provider="ollama",
@@ -30,7 +34,7 @@ from agent.actions import process_feature_request_all
 #     # base_url="",
 # )
 client = GiteaClient(
-    token="",
+    token=os.getenv("TOKEN") or "",
     repo_full_name="Tarekun/proof",
     base_url="https://iaisy.net:30003/api/v1",
 )
@@ -40,7 +44,8 @@ issue = Issue(
     state="open",
     labels=[],
 )
+mr = MergeRequest(id=180, title="", description="", state="open")
 # client.comment_issue(issue, "commento prova")
 # client.create_issue(issue)
-print(client.get_issues())
+print(client.get_mr_diff(mr))
 # process_feature_request_all(client, llm)
