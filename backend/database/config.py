@@ -1,11 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
+import os
 
-db_engine = "postgresql"
-db_host = "localhost:5432"
-db_user = "admin"
-db_password = "password"
-db_name = "aigile"
+load_dotenv()
+db_engine = os.getenv("DB_ENGINE")
+db_host = os.getenv("DB_HOST")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_name = os.getenv("DB_NAME", "aigile")
 
 full_url = f"{db_engine}://{db_user}:{db_password}@{db_host}/{db_name}"
 
@@ -28,9 +31,3 @@ def get_db():
 def create_tables():
     """Create all tables that extend Base if they don't exist"""
     Base.metadata.create_all(bind=engine)
-
-
-# Create tables on module import
-# create_tables()
-
-print(get_db())
