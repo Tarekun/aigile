@@ -14,7 +14,18 @@ class Issue:
     url: Optional[str] = None
     id: Optional[int] = None
     labels: List[str] = field(default_factory=list)
-    # assignees: Optional[List[str]] = None
+
+
+@dataclass
+class MergeRequest:
+    """Data structure representing a merge request on version control system"""
+
+    title: str
+    description: str
+    state: str
+    id: int
+    url: Optional[str] = None
+    labels: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -48,6 +59,14 @@ class VCClient(ABC):
     @abstractmethod
     def post_new_issue(self, issue: Issue):
         """POST API call to create a new issue. No error handling expected"""
+        pass
+
+    @abstractmethod
+    def get_mr_diff(self, mr: MergeRequest) -> str:
+        pass
+
+    @abstractmethod
+    def get_mr_issue(self, mr: MergeRequest) -> Issue | None:
         pass
 
     def _retry_api_call(self, callable):
